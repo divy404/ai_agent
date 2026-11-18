@@ -1,0 +1,58 @@
+ChatCompletion(
+    id='chatcmpl-802',
+    choices=[
+        Choice(
+            finish_reason='tool_calls',
+            index=0,
+            logprobs=None,
+            message=ChatCompletionMessage(
+                content='',
+                refusal=None,
+                role='assistant',
+                annotations=None,
+                audio=None,
+                function_call=None,
+                tool_calls=[
+                    ChatCompletionMessageFunctionToolCall(
+                        id='call_oe9sgwc2',
+                        function=Function(
+                            arguments='{"city":"Ujjain"}',
+                            name='get_city_weather'
+                        ),
+                        type='function',
+                        index=0
+                    )
+                ],
+                reasoning=(
+                    'Okay, the user is asking for the weather in Ujjain. '
+                    'Let me check the tools provided. There\'s a function '
+                    'called get_city_weather that takes a city name as a string. '
+                    'So I need to call that function with the city set to "Ujjain". '
+                    'I should make sure the city name is correctly spelled. '
+                    'Ujjain is a city in India, so the function should handle it. '
+                    'Let me structure the tool call accordingly.\n'
+                )
+            )
+        )
+    ],
+    created=1794994728,
+    model='qwen3:4b',
+    object='chat.completion',
+    metadata=None,
+    moderation=None,
+    service_tier=None,
+    system_fingerprint='fp_ollama',
+    usage=CompletionUsage(
+        completion_tokens=115,
+        prompt_tokens=208,
+        total_tokens=323,
+        completion_tokens_details=None,
+        prompt_tokens_details=PromptTokensDetails(
+            audio_tokens=None,
+            cache_write_tokens=None,
+            cached_tokens=0,
+            image_tokens=None,
+            text_tokens=None
+        )
+    )
+)

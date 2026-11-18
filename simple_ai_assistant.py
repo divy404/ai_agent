@@ -32,18 +32,20 @@ while True:
         "role": "user",
         "content": user_input
     })
+# chained tool calling 
+    while True:
+        response = client.chat.completions.create(
+                model=os.getenv("MODEL"),
+                messages=messages,
+                tools=TOOLS
+            )
+        msg = response.choices[0].message
 
-    response = client.chat.completions.create(
-        model=os.getenv("MODEL"),
-        messages=messages,
-        tools=TOOLS
-    )
+        if not msg.tool_calls:
+            break
 
-    msg = response.choices[0].message
-
-    if msg.tool_calls:
         messages.append(msg)
-
+             
         for tool_call in msg.tool_calls:
             func_name = tool_call.function.name
             func_args = json.loads(tool_call.function.arguments or "{}")
@@ -56,14 +58,7 @@ while True:
                 "tool_call_id": tool_call.id,
                 "content": str(result)
             })
-
-        response = client.chat.completions.create(
-            model=os.getenv("MODEL"),
-            messages=messages
-        )
-
-        msg = response.choices[0].message
-
+            
     messages.append({
         "role": "assistant",
         "content": msg.content

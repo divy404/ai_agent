@@ -9,6 +9,9 @@ def get_city_weather(city):
     response = requests.get(url, timeout=10)
     return response.text if response.status_code == 200 else "Could not fetch weather data."
 
+def get_user_city():
+    return "Ujjain"
+
 TOOLS = [
     {
         "type" : "function",
@@ -34,6 +37,14 @@ TOOLS = [
             }
         }
     },
+    {
+        "type":"function",
+        "function" : {
+            "name":"get_user_city",
+            "description":"Tells us the city of the user, where the user lives or my city.",
+            "parameters" : {"type":"object", "properties":{}},
+        }
+    },
 
 ]
 
@@ -43,5 +54,6 @@ TOOLS = [
 FUNCTION_NAME_TO_FUNCTION_MAP = {
     "get_current_time" : get_current_time,
     "get_city_weather" : get_city_weather,
+    "get_user_city" : get_user_city
 
 }
