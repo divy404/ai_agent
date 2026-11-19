@@ -1,5 +1,8 @@
 from datetime import datetime
+import json
 import requests
+
+from Utilities.utilities import log
 
 def get_current_time():
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -7,6 +10,7 @@ def get_current_time():
 def get_city_weather(city):
     url = f"https://wttr.in/{city}?format=3"
     response = requests.get(url, timeout=10)
+    response.raise_for_status() # Raise an error for bad responses
     return response.text if response.status_code == 200 else "Could not fetch weather data."
 
 def get_user_city():
@@ -33,7 +37,8 @@ TOOLS = [
                         "type" : "string",
                         "description" : "The name of the city to get the weather for."
                     }
-                }
+                },
+                "required" : ["city"]
             }
         }
     },
@@ -57,3 +62,19 @@ FUNCTION_NAME_TO_FUNCTION_MAP = {
     "get_user_city" : get_user_city
 
 }
+
+def run_tool(tool_call):
+    func_name = tool_call.function.name
+    if func_name not in FUNCTION_NAME_TO_FUNCTION_MAP:
+        raise ValueError(f"Function '{func_name}' is not defined in the function map.")
+    
+    try:
+        func_args = json.loads(tool_call.function.arguments or "{}")
+        log(f"Calling function '{func_name}' with arguments: {func_args}")
+        fn = FUNCTION_NAME_TO_FUNCTION_MAP[func_name]
+        result = fn(**func_args)  # Unpack dictionary into function arguments
+    except Exception as e:
+        result = f"Error while executing function '{func_name}': {str(e)}"
+
+    log(f"Function '{func_name}' returned: {result}")
+    return result
