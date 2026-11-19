@@ -16,6 +16,7 @@ client = OpenAI(
 
 messages = []
 
+MAX_STEPS = 5 # maximum steps for the agent for tool calling to avoid infinite loops 
 messages.append({
     "role": "system",
     "content": "Always respond in a fun way and keep the response within 27 words."
@@ -33,7 +34,7 @@ while True:
         "content": user_input
     })
 # chained tool calling 
-    while True:
+    for step in range(MAX_STEPS): 
         response = client.chat.completions.create(
                 model=os.getenv("MODEL"),
                 messages=messages,
@@ -48,17 +49,30 @@ while True:
              
         for tool_call in msg.tool_calls:
             func_name = tool_call.function.name
-            func_args = json.loads(tool_call.function.arguments or "{}")
+            func_args = {}
 
-            fn = FUNCTION_NAME_TO_FUNCTION_MAP[func_name]
-            result = fn(**func_args)  # Unpack dictionary into function arguments
+            try:
+                func_args = json.loads(tool_call.function.arguments or "{}")
+                fn = FUNCTION_NAME_TO_FUNCTION_MAP[func_name]
+                result = fn(**func_args)  # Unpack dictionary into function arguments
+            except Exception as e:
+                result = f"Error calling function {func_name}: {str(e)}"
 
             messages.append({
                 "role": "tool",
                 "tool_call_id": tool_call.id,
                 "content": str(result)
             })
-            
+    else:
+    # using else after for loops is used to check if the loop was exited normally and not using break
+        fallback = "Sorry, I couldn't finish this within step limit."
+        messages.append({
+        "role":"assistant",
+        "content": fallback
+        })
+        print("Assistant:"+ fallback)
+        continue
+
     messages.append({
         "role": "assistant",
         "content": msg.content
