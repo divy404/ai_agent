@@ -72,3 +72,5 @@ while True:
     })
 
     print("Assistant: " + (msg.content or ""))
+
+#  need to work on addiing streaming reponse for tools calls 
